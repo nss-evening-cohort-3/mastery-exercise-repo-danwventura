@@ -25,5 +25,17 @@ namespace RepoQuiz.DAL
             List<Student> all_students =  Context.Students.ToList();
             return all_students;
         }
+
+        public void AddNewStudent(Student student)
+        {
+            Context.Students.Add(student);
+            Context.SaveChanges();
+        }
+
+        public Student FindStudentById(int student_id)
+        {
+            Student found_student = Context.Students.FirstOrDefault(a => a.StudentID == student_id);
+            return found_student;
+        }
     }
 }
