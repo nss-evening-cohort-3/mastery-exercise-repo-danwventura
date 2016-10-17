@@ -16,5 +16,6 @@ namespace RepoQuiz.Models
         public string LastName { get; set; }
         [Required]
         public string Major { get; set; }
+
     }
 }
