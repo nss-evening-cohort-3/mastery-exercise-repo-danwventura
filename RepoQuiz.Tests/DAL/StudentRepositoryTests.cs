@@ -22,7 +22,24 @@ namespace RepoQuiz.Tests.DAL
         {
             var queryable_student_list = student_list.AsQueryable();
 
+            //      FOUR Behaviors of an IQueryable
+            mock_student_table.As<IQueryable<Student>>().Setup(mock => mock.Provider).Returns(queryable_student_list.Provider);
+            mock_student_table.As<IQueryable<Student>>().Setup(mock => mock.Expression).Returns(queryable_student_list.Expression);
+            mock_student_table.As<IQueryable<Student>>().Setup(mock => mock.ElementType).Returns(queryable_student_list.ElementType);
+            mock_student_table.As<IQueryable<Student>>().Setup(mock => mock.GetEnumerator()).Returns(queryable_student_list.GetEnumerator);
 
+            //      Have Students property return our queryable list AKA fake db table
+            mock_context.Setup(a => a.Students).Returns(mock_student_table.Object);
+        }
+
+        [TestInitialize]
+        public void Initiliaze()
+        {
+            mock_context = new Mock<StudentContext>();
+            mock_student_table = new Mock<DbSet<Student>>();
+            student_list = new List<Student>();
+            repo = new StudentRepository(mock_context.Object);
+            ConnectMocksToDatastore();
         }
 
         [TestCleanup]
@@ -36,6 +53,23 @@ namespace RepoQuiz.Tests.DAL
         {
             StudentRepository repo = new StudentRepository();
             Assert.IsNotNull(repo);
+        }
+
+        [TestMethod]
+        public void EnsureRepoHasContext()
+        {
+            StudentRepository repo = new StudentRepository();
+            StudentContext Context = new StudentContext();
+            Assert.IsInstanceOfType(Context, typeof(StudentContext));
+        }
+
+        [TestMethod]
+        public void EnsureThereAreNoStudents()
+        {
+            List<Student> all_students = repo.GetAllStudents();
+            int expected_count = 0;
+            int all_students_count = all_students.Count();
+            Assert.AreEqual(expected_count, all_students_count);
         }
     }
 }
